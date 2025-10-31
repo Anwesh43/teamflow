@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { account, ID } from "@/app/lib/appwrite";
+import { authHelper } from "../lib/appwrite";
+
+const authHelperClosure = authHelper()
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -31,8 +33,8 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await account.create(ID.unique(), email, password, name);
-      await account.createEmailSession(email, password);
+      await authHelperClosure.register(email, password)
+      await authHelperClosure.login(email, password);
       router.push("/");
       router.refresh();
     } catch (err: any) {

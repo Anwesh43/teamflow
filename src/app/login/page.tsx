@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { account } from "@/app/lib/appwrite";
+import { authHelper } from "../lib/appwrite";
+
+const authHelperClosure = authHelper()
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,7 +21,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await account.createEmailSession(email, password);
+      await authHelperClosure.login(email, password)
       router.push("/");
       router.refresh();
     } catch (err: any) {

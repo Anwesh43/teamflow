@@ -41,5 +41,24 @@ export const taskHelper = () => {
     }
 }
 
-
+export const authHelper = () => {
+    return {
+        async login(email: string, password: string) {
+            const result = await account.createEmailPasswordSession({
+                email,
+                password,
+            })
+            console.log("RESULT", result)
+            return result
+        },
+        async register(email: string, password: string) {
+            const userId = ID.unique()
+            const user = await account.create({
+                userId, email, password
+            })
+            console.log("USER", user)
+            return user
+        }
+    }
+}
 
