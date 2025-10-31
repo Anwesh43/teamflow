@@ -4,9 +4,9 @@ import { weatherTool } from "@/mastra/tools";
 import { LibSQLStore } from "@mastra/libsql";
 import { z } from "zod";
 import { Memory } from "@mastra/memory";
-
+import taskCreatorTool, { saveTaskTool } from '../tools/taskCreatorTool'
 export const AgentState = z.object({
-  proverbs: z.array(z.string()).default([]),
+  tasks: []
 });
 
 export const weatherAgent = new Agent({
@@ -14,6 +14,22 @@ export const weatherAgent = new Agent({
   tools: { weatherTool },
   model: openai("gpt-4o"),
   instructions: "You are a helpful assistant.",
+  memory: new Memory({
+    storage: new LibSQLStore({ url: "file::memory:" }),
+    options: {
+      workingMemory: {
+        enabled: true,
+        schema: AgentState,
+      },
+    },
+  }),
+});
+
+export const tasksAgent = new Agent({
+  name: "Task Agent",
+  tools: { taskCreatorTool, saveTaskTool, },
+  model: openai("gpt-4o"),
+  instructions: "You are a helpful assistant who will create tasks from meeting notes and PRD. You will aslo save tasks in db",
   memory: new Memory({
     storage: new LibSQLStore({ url: "file::memory:" }),
     options: {

@@ -2,15 +2,88 @@
 
 import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AgentState as AgentStateSchema } from "@/mastra/agents";
 import { z } from "zod";
 import { WeatherToolResult } from "@/mastra/tools";
+import { TasksCreatorToolResult } from '@/mastra/tools/taskCreatorTool'
+import useTasks from "./hooks/useTasks";
+
 
 type AgentState = z.infer<typeof AgentStateSchema>;
 
+function TasksCard({
+  themeColor,
+  result,
+  status
+}: {
+  themeColor: string,
+  result: WeatherToolResult,
+  status: "inProgress" | "executing" | "complete"
+}) {
+  if (status !== "complete") {
+    return (
+      <div
+        className="rounded-xl shadow-xl mt-6 mb-4 max-w-md w-full"
+        style={{ backgroundColor: themeColor }}
+      >
+        <div className="bg-white/20 p-4 w-full">
+          <p className="text-white animate-pulse">Loading tasks for your PRD...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      style={{ backgroundColor: themeColor }}
+      className="rounded-xl shadow-xl mt-6 mb-4 max-w-md w-full"
+    >
+      <div className="bg-white/20 p-4 w-full">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-white capitalize">Tasks for your PRD</h3>
+            <p className="text-white">Tasks</p>
+          </div>
+          <SunIcon />
+        </div>
+        {result && result.map((task) => (
+          <div className="mt-4 mb-4 pt-4 border-t border-white">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p className="text-white text-xs">Task</p>
+                <p className="text-white font-medium">{task.title}%</p>
+              </div>
+              <div>
+                <p className="text-white text-xs">Task</p>
+                <p className="text-white font-medium">{task.description}%</p>
+              </div>
+              <div>
+                <p className="text-white text-xs">Description</p>
+                <p className="text-white font-medium">{task.description}%</p>
+              </div>
+              <div>
+                <p className="text-white text-xs">Priority</p>
+                <p className="text-white font-medium">{task.priority} mph</p>
+              </div>
+              <div>
+                <p className="text-white text-xs">Time needed</p>
+                <p className="text-white font-medium">{task.time}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+
+
+
+      </div>
+    </div>
+  );
+}
+
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
+
 
   // 🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions
   useCopilotAction({
@@ -18,7 +91,7 @@ export default function CopilotKitPage() {
     parameters: [{
       name: "themeColor",
       description: "The theme color to set. Make sure to pick nice colors.",
-      required: true, 
+      required: true,
     }],
     handler({ themeColor }) {
       setThemeColor(themeColor);
@@ -42,31 +115,50 @@ export default function CopilotKitPage() {
 
 function YourMainContent({ themeColor }: { themeColor: string }) {
   // 🪁 Shared State: https://docs.copilotkit.ai/coagents/shared-state
-  const {state, setState} = useCoAgent<AgentState>({
-    name: "weatherAgent",
+  const { state, setState } = useCoAgent<AgentState>({
+    name: "tasksAgent",
     initialState: {
-      proverbs: [
-        "CopilotKit may be new, but its the best thing since sliced bread.",
+      tasks: [
       ],
     },
   })
-
+  const [tasks, setTasks] = useState([])
   //🪁 Generative UI: https://docs.copilotkit.ai/coagents/generative-ui
+  // useCopilotAction({
+  //   name: "weatherTool",
+  //   description: "Get the weather for a given location.",
+  //   available: "frontend",
+  //   parameters: [
+  //     { name: "location", type: "string", required: true },
+  //   ],
+  //   render: ({ args, result, status }) => {
+  //     return <WeatherCard
+  //       location={args.location}
+  //       themeColor={themeColor}
+  //       result={result}
+  //       status={status}
+  //     />
+  //   },
+  // });
+
   useCopilotAction({
-    name: "weatherTool",
-    description: "Get the weather for a given location.",
+    name: "taskCreatorTool",
+    description: "Get tasks from PRD.",
     available: "frontend",
     parameters: [
-      { name: "location", type: "string", required: true },
+      { name: "prdText", type: "string", required: true },
     ],
     render: ({ args, result, status }) => {
-      return <WeatherCard 
-        location={args.location} 
-        themeColor={themeColor} 
-        result={result} 
+
+      return <TasksCard
+        themeColor={themeColor}
+        result={result}
         status={status}
       />
     },
+    handler: async (result) => {
+      setTasks(result)
+    }
   });
 
   useCopilotAction({
@@ -84,35 +176,17 @@ function YourMainContent({ themeColor }: { themeColor: string }) {
       </div>
     },
   });
-
+  console.log("STATE_TASKS", state)
+  const { tasks: tasksUIObj } = useTasks()
   return (
     <div
       style={{ backgroundColor: themeColor }}
       className="h-screen w-screen flex justify-center items-center flex-col transition-colors duration-300"
     >
       <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-xl max-w-2xl w-full">
-        <h1 className="text-4xl font-bold text-white mb-2 text-center">Proverbs</h1>
-        <p className="text-gray-200 text-center italic mb-6">This is a demonstrative page, but it could be anything you want! 🪁</p>
         <hr className="border-white/20 my-6" />
         <div className="flex flex-col gap-3">
-          {state.proverbs?.map((proverb, index) => (
-            <div 
-              key={index} 
-              className="bg-white/15 p-4 rounded-xl text-white relative group hover:bg-white/20 transition-all"
-            >
-              <p className="pr-8">{proverb}</p>
-              <button 
-                onClick={() => setState({
-                  ...state,
-                  proverbs: state.proverbs?.filter((_, i) => i !== index),
-                })}
-                className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity 
-                  bg-red-500 hover:bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+          <TasksCard result={tasksUIObj} status={"complete"} themeColor={themeColor}></TasksCard>
         </div>
         {state.proverbs?.length === 0 && <p className="text-center text-white/80 italic my-8">
           No proverbs yet. Ask the assistant to add some!
@@ -124,20 +198,20 @@ function YourMainContent({ themeColor }: { themeColor: string }) {
 
 // Weather card component where the location and themeColor are based on what the agent
 // sets via tool calls.
-function WeatherCard({ 
-  location, 
-  themeColor, 
-  result, 
-  status 
-}: { 
-  location?: string, 
-  themeColor: string, 
-  result: WeatherToolResult, 
-  status: "inProgress" | "executing" | "complete" 
+function WeatherCard({
+  location,
+  themeColor,
+  result,
+  status
+}: {
+  location?: string,
+  themeColor: string,
+  result: WeatherToolResult,
+  status: "inProgress" | "executing" | "complete"
 }) {
   if (status !== "complete") {
     return (
-      <div 
+      <div
         className="rounded-xl shadow-xl mt-6 mb-4 max-w-md w-full"
         style={{ backgroundColor: themeColor }}
       >
@@ -159,9 +233,9 @@ function WeatherCard({
             <h3 className="text-xl font-bold text-white capitalize">{location}</h3>
             <p className="text-white">Current Weather</p>
           </div>
-          <WeatherIcon conditions={result.conditions} />         
+          <WeatherIcon conditions={result.conditions} />
         </div>
-        
+
         <div className="mt-4 flex items-end justify-between">
           <div className="text-3xl font-bold text-white">
             <span className="">
@@ -174,7 +248,7 @@ function WeatherCard({
           </div>
           <div className="text-sm text-white">{result.conditions}</div>
         </div>
-        
+
         <div className="mt-4 pt-4 border-t border-white">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
@@ -196,6 +270,8 @@ function WeatherCard({
   );
 }
 
+
+
 function WeatherIcon({ conditions }: { conditions: string }) {
   if (!conditions) return null;
 
@@ -205,7 +281,7 @@ function WeatherIcon({ conditions }: { conditions: string }) {
   ) {
     return <SunIcon />;
   }
-  
+
   if (
     conditions.toLowerCase().includes("rain") ||
     conditions.toLowerCase().includes("drizzle") ||
@@ -213,8 +289,8 @@ function WeatherIcon({ conditions }: { conditions: string }) {
     conditions.toLowerCase().includes("thunderstorm")
   ) {
     return <RainIcon />;
-  } 
-  
+  }
+
   if (
     conditions.toLowerCase().includes("fog") ||
     conditions.toLowerCase().includes("cloud") ||
@@ -240,9 +316,9 @@ function RainIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14 text-blue-200">
       {/* Cloud */}
-      <path d="M7 15a4 4 0 0 1 0-8 5 5 0 0 1 10 0 4 4 0 0 1 0 8H7z" fill="currentColor" opacity="0.8"/>
+      <path d="M7 15a4 4 0 0 1 0-8 5 5 0 0 1 10 0 4 4 0 0 1 0 8H7z" fill="currentColor" opacity="0.8" />
       {/* Rain drops */}
-      <path d="M8 18l2 4M12 18l2 4M16 18l2 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      <path d="M8 18l2 4M12 18l2 4M16 18l2 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -250,7 +326,8 @@ function RainIcon() {
 function CloudIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14 text-gray-200">
-      <path d="M7 15a4 4 0 0 1 0-8 5 5 0 0 1 10 0 4 4 0 0 1 0 8H7z" fill="currentColor"/>
+      <path d="M7 15a4 4 0 0 1 0-8 5 5 0 0 1 10 0 4 4 0 0 1 0 8H7z" fill="currentColor" />
     </svg>
   );
 }
+
