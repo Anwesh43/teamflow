@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { account } from "@/app/lib/appwrite";
 import { authHelper } from "../lib/appwrite";
 
 const authHelperClosure = authHelper()
@@ -24,7 +23,7 @@ export default function LoginPage() {
       await authHelperClosure.login(email, password)
       router.push("/");
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message || "Failed to login. Please check your credentials.");
     } finally {
       setLoading(false);
@@ -102,7 +101,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
+              {"Don't have an account?"}
               <Link
                 href="/register"
                 className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"

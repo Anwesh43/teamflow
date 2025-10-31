@@ -1,6 +1,5 @@
 import { Task, taskHelper } from "../lib/appwrite"
 import { useState, useEffect } from "react";
-import { useCopilotChatHeadless_c } from "@copilotkit/react-core";
 
 const taskHelperObj = taskHelper()
 

@@ -37,7 +37,7 @@ export default function RegisterPage() {
       await authHelperClosure.login(email, password);
       router.push("/");
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message || "Failed to create account. Please try again.");
     } finally {
       setLoading(false);
