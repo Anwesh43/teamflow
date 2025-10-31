@@ -2,12 +2,14 @@
 
 import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AgentState as AgentStateSchema } from "@/mastra/agents";
 import { z } from "zod";
 import { WeatherToolResult } from "@/mastra/tools";
 import useTasks from "./hooks/useTasks";
+import { authHelper } from "./lib/appwrite";
 
+const authHelperObj = authHelper()
 
 type AgentState = z.infer<typeof AgentStateSchema>;
 
@@ -83,7 +85,12 @@ function TasksCard({
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
 
-
+  const [userId, setUserId] = useState("")
+  useEffect(() => {
+    authHelperObj.getCurrentUserId().then((userId) => {
+      setUserId(userId)
+    })
+  })
   // 🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions
   useCopilotAction({
     name: "setThemeColor",
@@ -99,7 +106,7 @@ export default function CopilotKitPage() {
 
   return (
     <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
-      <YourMainContent themeColor={themeColor} />
+      <YourMainContent themeColor={themeColor} userId={userId} />
       <CopilotSidebar
         clickOutsideToClose={false}
         defaultOpen={true}
@@ -112,7 +119,9 @@ export default function CopilotKitPage() {
   );
 }
 
-function YourMainContent({ themeColor }: { themeColor: string }) {
+function YourMainContent({ themeColor, userId }: { themeColor: string, userId: string }) {
+
+  console.log("USERId", userId)
   // 🪁 Shared State: https://docs.copilotkit.ai/coagents/shared-state
   const { state } = useCoAgent<AgentState>({
     name: "tasksAgent",
@@ -146,6 +155,7 @@ function YourMainContent({ themeColor }: { themeColor: string }) {
     available: "frontend",
     parameters: [
       { name: "prdText", type: "string", required: true },
+      { name: "userId", type: "string", required: true },
     ],
     render: ({ result, status }) => {
 

@@ -27,16 +27,17 @@ export interface Task extends Models.Row {
     timeEstimate: number;
     status?: string;
     assignedTo?: string;
+    userId: string;
 }
 
 export const taskHelper = () => {
     return {
-        async getTasks(): Promise<Task[]> {
-            const response = await tablesDB.listRows<Task[]>(
+        async getTasks() {
+            const response = await tablesDB.listRows(
                 databaseId,
                 tasksId,
             )
-            return response.rows as Task[]
+            return response.rows
         }
     }
 }
@@ -58,6 +59,16 @@ export const authHelper = () => {
             })
             console.log("USER", user)
             return user
+        },
+        async getCurrentUserId() {
+            let userId = ""
+            try {
+                const user = await account.get()
+                userId = user.$id
+            } catch (err) {
+                console.error("Err", err)
+            }
+            return userId
         }
     }
 }

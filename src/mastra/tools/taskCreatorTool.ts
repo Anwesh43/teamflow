@@ -32,12 +32,14 @@ const taskCreatorTool = createTool({
     description: 'create list of tasks from PRD provided',
     inputSchema: z.object({
         prdText: z.string(),
+        userId: z.string(),
     }),
     outputSchema: TasksCreatorToolResult,
     execute: async ({ context }) => {
         const resp = await llamaIndexService(context.prdText)
         console.log("RESPONSE", resp)
-        return JSON.parse(resp.replaceAll("```", "").replaceAll("json", ""))
+        const tasks = JSON.parse(resp.replaceAll("```", "").replaceAll("json", ""))
+        return tasks.map((task) => ({ userId: context.userId, ...task }))
     }
 })
 
@@ -49,6 +51,7 @@ export const saveTaskTool = createTool({
         description: z.string(),
         timeEstimate: z.number(),
         priority: z.string(),
+        userId: z.string(),
     }),
     outputSchema: TasksCreatorToolResult,
     execute: async ({ context }) => {
@@ -57,6 +60,7 @@ export const saveTaskTool = createTool({
             description: context.description,
             timeEstimate: context.timeEstimate,
             priority: context.priority,
+            userId: context.userId,
         }
         await taskDbHelperObj.createTask(task)
     }
