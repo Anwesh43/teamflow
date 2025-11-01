@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     // !! WARN !!
     ignoreBuildErrors: true,
-  }
+  },
+  output: "standalone"
 };
 
 export default nextConfig;
