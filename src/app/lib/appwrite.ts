@@ -3,6 +3,7 @@ import {
     TablesDB,
     Account,
     ID,
+    Query,
     type Models,
 } from 'appwrite'
 
@@ -20,7 +21,7 @@ export { ID }
 const databaseId = process.env.NEXT_PUBLIC_DATABASE_ID!;
 const tasksId = process.env.NEXT_PUBLIC_TABLE_ID!;
 
-export interface Task extends Models.Row {
+export interface Task extends Models {
     title: string;
     description: string;
     priority: string;
@@ -30,17 +31,6 @@ export interface Task extends Models.Row {
     userId: string;
 }
 
-export const taskHelper = () => {
-    return {
-        async getTasks() {
-            const response = await tablesDB.listRows(
-                databaseId,
-                tasksId,
-            )
-            return response.rows
-        }
-    }
-}
 
 export const authHelper = () => {
     return {
@@ -52,10 +42,10 @@ export const authHelper = () => {
             console.log("RESULT", result)
             return result
         },
-        async register(email: string, password: string) {
+        async register(email: string, password: string, name: string) {
             const userId = ID.unique()
             const user = await account.create({
-                userId, email, password
+                userId, email, password, name
             })
             console.log("USER", user)
             return user
@@ -64,12 +54,42 @@ export const authHelper = () => {
             let userId = ""
             try {
                 const user = await account.get()
+                console.log("USER_OBJECT", user)
                 userId = user.$id
+                console.log("USER_ID", user.$id, user["$id"])
             } catch (err) {
                 console.error("Err", err)
             }
             return userId
+        },
+
+        async getCurrentUser() {
+            let currentUser = null
+            try {
+                currentUser = await account.get()
+                console.log("CURRENT_USER", currentUser)
+                return currentUser
+            } catch (err) {
+                console.log("ERR", err)
+                throw err
+            }
         }
     }
 }
 
+export const taskHelper = () => {
+    const authHelperObj = authHelper()
+    return {
+        async getTasks() {
+            const userId = await authHelperObj.getCurrentUserId()
+            const response = await tablesDB.listRows<Task>({
+                databaseId,
+                tableId: tasksId,
+                queries: [
+                    Query.equal("userId", userId)
+                ]
+            })
+            return response.rows
+        }
+    }
+}

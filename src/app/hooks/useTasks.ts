@@ -1,33 +1,20 @@
 import { taskHelper } from "../lib/appwrite"
 import { useState, useEffect } from "react";
+import { Task } from "@/models/Task";
 
 const taskHelperObj = taskHelper()
 
-export interface TaskUIObject {
-    title: string;
-    description: string;
-    priority: string;
-    timeEstimate: number;
-    status?: string;
-    assignedTo?: string;
-    userId: string;
-}
+
 const useTasks = () => {
-    const [tasks, setTasks] = useState<TaskUIObject[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
     useEffect(() => {
         taskHelperObj.getTasks().then((tasks) => {
             console.log("TASKS", tasks)
-            setTasks(tasks.map((task) => ({
-                title: task.title,
-                description: task.description,
-                priority: task.description,
-                userId: task.userId,
-                timeEstimate: task.timeEstimate,
-            })))
+            setTasks(tasks)
         })
     }, [])
     return {
-        tasks
+        tasks,
     }
 }
 

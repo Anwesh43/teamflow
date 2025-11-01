@@ -33,7 +33,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await authHelperClosure.register(email, password)
+      await authHelperClosure.register(email, password, name)
       await authHelperClosure.login(email, password);
       router.push("/");
       router.refresh();
