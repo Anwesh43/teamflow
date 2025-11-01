@@ -1,9 +1,9 @@
 "use client";
 
-import { useCopilotAction } from "@copilotkit/react-core";
+import { useCopilotAction, useCoAgent } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotChat } from "@copilotkit/react-ui";
 import { useEffect, useState } from "react";
-// import { AgentState as AgentStateSchema } from "@/mastra/agents";
+import { AgentState as AgentStateSchema } from "@/mastra/agents";
 import { z } from "zod";
 import { TasksCreatorToolResult } from "@/mastra/tools/taskCreatorTool";
 import { useRouter } from "next/navigation";
@@ -63,7 +63,7 @@ function TasksCard({
         </div>
         {result && Array.isArray(result) && result.map((task) => (
           <div className="mt-4 mb-4 pt-4 w- border-t border-white" key={task.title}>
-            <div className="grid grid-rows-4 gap-2">
+            <div className="grid grid-rows-5 gap-2">
               <div>
                 <span className="text-white text-xs">Task</span>
                 <p className="text-white font-medium">{task.title}</p>
@@ -79,6 +79,10 @@ function TasksCard({
               <div>
                 <span className="text-white text-xs">Time needed</span>
                 <p className="text-white font-medium">{task.time}</p>
+              </div>
+              <div>
+                <span className="text-white text-xs">Assigned To</span>
+                <p className="text-white font-medium">{task.assignedTo}</p>
               </div>
             </div>
           </div>
@@ -106,7 +110,13 @@ function TasksCard({
 
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
-
+  const { state, setState } = useCoAgent<AgentStateSchema>({
+    name: "tasksAgent",
+    initialState: {
+      userId: ""
+    }
+  })
+  console.log("AGENT_STATE", state)
   const router = useRouter();
   const [userId, setUserId] = useState("")
   const [userName, setUserName] = useState("")
@@ -115,7 +125,9 @@ export default function CopilotKitPage() {
     authHelperObj.getCurrentUser().then((user) => {
       setUserId(user.$id)
       setUserName(user.name)
-
+      setState({
+        userId
+      })
     }).catch((err) => {
       console.error("LOGIN_ERROR", err)
       router.push("/register")
@@ -164,7 +176,9 @@ export default function CopilotKitPage() {
       <CopilotChat labels={{
         title: "Popup Assistant",
         initial: `👋 Hi ${userName},  You're chatting with an tasks creating agent. This agent helps you create tasks from a PRD.\n\nFor example you can try:\n- **Create tasks from PRD**: "YOUR_PRD_TEXT"`
-      }} />
+      }} instructions={
+        `You will create tasks from PRD text provided by user having userId ${userId}`
+      } />
     </main>
   );
 }
