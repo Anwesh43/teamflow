@@ -30,7 +30,7 @@
     "llamaindex": "^0.12.0",
     "lucide-react": "^0.552.0",
     "mastra": "0.15.1",
-    "next": ">=15.5.4",
+    "next": "15.5.7",
     "node-appwrite": "^20.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
