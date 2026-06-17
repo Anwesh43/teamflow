@@ -7,6 +7,7 @@ import { AgentState as AgentStateSchema } from "@/mastra/agents";
 import { z } from "zod";
 import { TasksCreatorToolResult } from "@/mastra/tools/taskCreatorTool";
 import { useRouter } from "next/navigation";
+import Navigation from "@/components/Navigation";
 
 type TasksCreatorToolResultType = z.infer<typeof TasksCreatorToolResult>;
 // import useTasks from "./hooks/useTasks";
@@ -163,23 +164,26 @@ export default function CopilotKitPage() {
     }
   });
   return (
-    <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
-      {/* <YourMainContent themeColor={themeColor} userId={userId} /> */}
-      {/* <CopilotSidebar
-        clickOutsideToClose={false}
-        defaultOpen={true}
-        labels={{
+    <>
+      <Navigation />
+      <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
+        {/* <YourMainContent themeColor={themeColor} userId={userId} /> */}
+        {/* <CopilotSidebar
+          clickOutsideToClose={false}
+          defaultOpen={true}
+          labels={{
+            title: "Popup Assistant",
+            initial: "👋 Hi, there! You're chatting with an agent. This agent comes with a few tools to get you started.\n\nFor example you can try:\n- **Frontend Tools**: \"Set the theme to orange\"\n- **Shared State**: \"Write a proverb about AI\"\n- **Generative UI**: \"Get the weather in SF\"\n\nAs you interact with the agent, you'll see the UI update in real-time to reflect the agent's **state**, **tool calls**, and **progress**."
+          }}
+        /> */}
+        <CopilotChat labels={{
           title: "Popup Assistant",
-          initial: "👋 Hi, there! You're chatting with an agent. This agent comes with a few tools to get you started.\n\nFor example you can try:\n- **Frontend Tools**: \"Set the theme to orange\"\n- **Shared State**: \"Write a proverb about AI\"\n- **Generative UI**: \"Get the weather in SF\"\n\nAs you interact with the agent, you'll see the UI update in real-time to reflect the agent's **state**, **tool calls**, and **progress**."
-        }}
-      /> */}
-      <CopilotChat labels={{
-        title: "Popup Assistant",
-        initial: `👋 Hi ${userName},  You're chatting with an tasks creating agent. This agent helps you create tasks from a PRD.\n\nFor example you can try:\n- **Create tasks from PRD**: "YOUR_PRD_TEXT"`
-      }} instructions={
-        `You will create tasks from PRD text provided by user having userId ${userId}`
-      } />
-    </main>
+          initial: `👋 Hi ${userName},  You're chatting with an tasks creating agent. This agent helps you create tasks from a PRD.\n\nFor example you can try:\n- **Create tasks from PRD**: "YOUR_PRD_TEXT"`
+        }} instructions={
+          `You will create tasks from PRD text provided by user having userId ${userId}`
+        } />
+      </main>
+    </>
   );
 }
 
