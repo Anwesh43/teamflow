@@ -8,6 +8,7 @@ import { z } from "zod";
 import { TasksCreatorToolResult } from "@/mastra/tools/taskCreatorTool";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import HomePage from "@/components/HomePage";
 
 type TasksCreatorToolResultType = z.infer<typeof TasksCreatorToolResult>;
 // import useTasks from "./hooks/useTasks";
@@ -111,17 +112,17 @@ function TasksCard({
 
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
+  const [showChat, setShowChat] = useState(false);
   const { state, setState } = useCoAgent<AgentStateSchema>({
     name: "tasksAgent",
     initialState: {
       userId: ""
     }
   })
-  console.log("AGENT_STATE", state)
   const router = useRouter();
   const [userId, setUserId] = useState("")
   const [userName, setUserName] = useState("")
-  console.log("USER_ID", userId)
+
   useEffect(() => {
     authHelperObj.getCurrentUser().then((user) => {
       setUserId(user.$id)
@@ -131,9 +132,9 @@ export default function CopilotKitPage() {
       })
     }).catch((err) => {
       console.error("LOGIN_ERROR", err)
-      router.push("/register")
+      router.push("/login")
     })
-  })
+  }, [])
   // 🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions
   useCopilotAction({
     name: "setThemeColor",
@@ -165,24 +166,19 @@ export default function CopilotKitPage() {
   });
   return (
     <>
-      <Navigation />
-      <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
-        {/* <YourMainContent themeColor={themeColor} userId={userId} /> */}
-        {/* <CopilotSidebar
-          clickOutsideToClose={false}
-          defaultOpen={true}
-          labels={{
-            title: "Popup Assistant",
-            initial: "👋 Hi, there! You're chatting with an agent. This agent comes with a few tools to get you started.\n\nFor example you can try:\n- **Frontend Tools**: \"Set the theme to orange\"\n- **Shared State**: \"Write a proverb about AI\"\n- **Generative UI**: \"Get the weather in SF\"\n\nAs you interact with the agent, you'll see the UI update in real-time to reflect the agent's **state**, **tool calls**, and **progress**."
-          }}
-        /> */}
-        <CopilotChat labels={{
-          title: "Popup Assistant",
-          initial: `👋 Hi ${userName},  You're chatting with an tasks creating agent. This agent helps you create tasks from a PRD.\n\nFor example you can try:\n- **Create tasks from PRD**: "YOUR_PRD_TEXT"`
-        }} instructions={
-          `You will create tasks from PRD text provided by user having userId ${userId}`
-        } />
-      </main>
+      <Navigation showChat={showChat} onChatToggle={() => setShowChat(!showChat)} />
+      {!showChat ? (
+        <HomePage userName={userName} />
+      ) : (
+        <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
+          <CopilotChat labels={{
+            title: "AI Task Creation Assistant",
+            initial: `👋 Hi ${userName},  You're chatting with a task creation agent. This agent helps you create tasks from PRD text.\n\nFor example you can try:\n- **Create tasks from PRD**: "Paste your PRD text here"`
+          }} instructions={
+            `You will create tasks from PRD text provided by user having userId ${userId}. Always help users organize their work efficiently.`
+          } />
+        </main>
+      )}
     </>
   );
 }

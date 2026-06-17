@@ -8,7 +8,7 @@ import { useState } from "react";
 
 const authHelperObj = authHelper();
 
-export default function Navigation() {
+export default function Navigation({ showChat, onChatToggle }: { showChat?: boolean; onChatToggle?: () => void }) {
   const pathname = usePathname();
   const [userMenu, setUserMenu] = useState(false);
 
@@ -43,17 +43,17 @@ export default function Navigation() {
               Tasks
             </Link>
 
-            <Link
-              href="/"
+            <button
+              onClick={onChatToggle}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition ${
-                pathname === "/" || pathname === "/register" || pathname === "/login"
-                  ? "text-gray-600"
+                showChat
+                  ? "bg-indigo-100 text-indigo-600"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              } ${pathname === "/" ? "bg-indigo-100 text-indigo-600" : ""}`}
+              }`}
             >
               <MessageSquare className="w-4 h-4" />
               AI Assistant
-            </Link>
+            </button>
 
             {/* Logout */}
             <button
