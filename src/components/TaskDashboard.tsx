@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Task } from "@/models/Task";
 import { taskHelper } from "@/app/lib/appwrite";
-import { ChevronDown, Search, Filter, CheckCircle, Clock, AlertCircle, User } from "lucide-react";
+import { Search, Filter, CheckCircle, Clock, AlertCircle, User } from "lucide-react";
 
 const taskHelperObj = taskHelper();
 

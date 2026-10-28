@@ -3,14 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, MessageSquare, LogOut } from "lucide-react";
-import { authHelper } from "@/app/lib/appwrite";
-import { useState } from "react";
-
-const authHelperObj = authHelper();
 
 export default function Navigation({ showChat, onChatToggle }: { showChat?: boolean; onChatToggle?: () => void }) {
   const pathname = usePathname();
-  const [userMenu, setUserMenu] = useState(false);
 
   const handleLogout = async () => {
     try {

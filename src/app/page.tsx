@@ -113,7 +113,7 @@ function TasksCard({
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
   const [showChat, setShowChat] = useState(false);
-  const { state, setState } = useCoAgent<AgentStateSchema>({
+  const { setState } = useCoAgent<AgentStateSchema>({
     name: "tasksAgent",
     initialState: {
       userId: ""
@@ -128,7 +128,7 @@ export default function CopilotKitPage() {
       setUserId(user.$id)
       setUserName(user.name)
       setState({
-        userId
+        userId: user.$id
       })
     }).catch((err) => {
       console.error("LOGIN_ERROR", err)

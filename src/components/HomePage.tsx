@@ -8,26 +8,11 @@ import { Task } from "@/models/Task";
 
 const taskHelperObj = taskHelper();
 
-const getPriorityColor = (priority: string) => {
-  switch (priority?.toUpperCase()) {
-    case "P1":
-      return "text-red-600";
-    case "P2":
-      return "text-yellow-600";
-    case "P3":
-      return "text-blue-600";
-    default:
-      return "text-gray-600";
-  }
-};
-
 export default function HomePage({ userName }: { userName: string }) {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTasks = async () => {
-      setLoading(false);
       const tasksData = await taskHelperObj.getTasks();
       setTasks(tasksData);
     };
@@ -52,7 +37,7 @@ export default function HomePage({ userName }: { userName: string }) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900">Welcome back, {userName}! 👋</h1>
-              <p className="text-gray-600 mt-2">Here's what's happening with your tasks today</p>
+              <p className="text-gray-600 mt-2">Here&apos;s what&apos;s happening with your tasks today</p>
             </div>
             <Link
               href="/"
