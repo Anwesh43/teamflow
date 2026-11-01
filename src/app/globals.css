@@ -125,3 +125,73 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* AI assistant chat (ChatGPT / Claude style) */
+.teamflow-chat {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Empty conversation: hide the message list and center the composer */
+.teamflow-chat:has(.tf-composer-empty) {
+  justify-content: center;
+}
+.teamflow-chat:has(.tf-composer-empty) .copilotKitMessages {
+  display: none;
+}
+
+.teamflow-chat .copilotKitMessages {
+  background: #fff;
+}
+.teamflow-chat .copilotKitMessagesContainer {
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 1rem;
+}
+.teamflow-chat .copilotKitMessagesFooter {
+  max-width: 48rem;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.teamflow-chat .copilotKitMessage {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.teamflow-chat .copilotKitMessage.copilotKitUserMessage {
+  background: #f4f4f5;
+  color: #18181b;
+  border-radius: 1.5rem;
+  padding: 0.625rem 1.125rem;
+  max-width: 75%;
+  line-height: 1.6;
+}
+.teamflow-chat .copilotKitMessage.copilotKitAssistantMessage {
+  color: #18181b;
+  padding: 0 0 1.75rem;
+  max-width: 100%;
+}
+.teamflow-chat .copilotKitMessage.copilotKitAssistantMessage + .copilotKitMessage.copilotKitUserMessage {
+  margin-top: 0.5rem;
+}
+.teamflow-chat .copilotKitMessageControlButton {
+  color: #71717a;
+}
+.teamflow-chat .copilotKitMessageControlButton:hover {
+  color: #18181b;
+}
+.teamflow-chat .copilotKitCustomAssistantMessage {
+  margin: 0 0 1.5rem;
+}
+.teamflow-chat p.copilotKitMarkdownElement:not(:last-child),
+.teamflow-chat ul.copilotKitMarkdownElement:not(:last-child),
+.teamflow-chat ol.copilotKitMarkdownElement:not(:last-child) {
+  margin-bottom: 0.875rem;
+}
+.teamflow-chat .copilotKitMessages::-webkit-scrollbar-thumb {
+  background-color: #d4d4d8;
+  border-color: #fff;
+}

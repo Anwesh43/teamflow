@@ -1,7 +1,6 @@
 "use client";
 
 import { useCopilotAction, useCoAgent } from "@copilotkit/react-core";
-import { CopilotKitCSSProperties, CopilotChat } from "@copilotkit/react-ui";
 import { useEffect, useState } from "react";
 import { AgentState as AgentStateSchema } from "@/mastra/agents";
 import { z } from "zod";
@@ -9,6 +8,8 @@ import { TasksCreatorToolResult } from "@/mastra/tools/taskCreatorTool";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import HomePage from "@/components/HomePage";
+import AssistantChat from "@/components/AssistantChat";
+import { CheckCircle2, Clock, Loader2, User } from "lucide-react";
 
 type TasksCreatorToolResultType = z.infer<typeof TasksCreatorToolResult>;
 // import useTasks from "./hooks/useTasks";
@@ -28,6 +29,12 @@ const authHelperObj = authHelper()
 
 //type AgentState = z.infer<typeof AgentStateSchema>;
 
+const PRIORITY_STYLES: Record<string, string> = {
+  P1: "bg-red-50 text-red-700 ring-red-200",
+  P2: "bg-amber-50 text-amber-700 ring-amber-200",
+  P3: "bg-blue-50 text-blue-700 ring-blue-200",
+};
+
 function TasksCard({
   themeColor,
   result,
@@ -39,60 +46,41 @@ function TasksCard({
 }) {
   if (status !== "complete") {
     return (
-      <div
-        className="rounded-xl shadow-xl mt-6 mb-4 max-w-md w-full"
-        style={{ backgroundColor: themeColor }}
-      >
-        <div className="bg-white/20 p-4 w-full">
-          <p className="text-white animate-pulse">Loading tasks for your PRD...</p>
-        </div>
+      <div className="my-2 flex w-full items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+        <Loader2 className="h-4 w-4 animate-spin" style={{ color: themeColor }} />
+        Reading your PRD and drafting tasks...
       </div>
     )
   }
 
+  const tasks = Array.isArray(result) ? result : [];
+
   return (
-    <div
-      style={{ backgroundColor: themeColor }}
-      className="rounded-xl shadow-xl mt-6 mb-4 max-w-md w-full"
-    >
-      <div className="bg-white/20 p-2 w-full">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-xl font-bold text-white capitalize">Tasks for your PRD</h3>
-            <p className="text-white">Tasks</p>
-          </div>
-          <SunIcon />
+    <div className="my-2 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4" style={{ color: themeColor }} />
+          <h3 className="text-sm font-semibold text-gray-900">Tasks created from your PRD</h3>
         </div>
-        {result && Array.isArray(result) && result.map((task) => (
-          <div className="mt-4 mb-4 pt-4 w- border-t border-white" key={task.title}>
-            <div className="grid grid-rows-5 gap-2">
-              <div>
-                <span className="text-white text-xs">Task</span>
-                <p className="text-white font-medium">{task.title}</p>
-              </div>
-              <div>
-                <span className="text-white text-xs">Description</span>
-                <p className="text-white font-medium">{task.description}%</p>
-              </div>
-              <div>
-                <span className="text-white text-xs">Priority</span>
-                <p className="text-white font-medium">{task.priority} mph</p>
-              </div>
-              <div>
-                <span className="text-white text-xs">Time needed</span>
-                <p className="text-white font-medium">{task.time}</p>
-              </div>
-              <div>
-                <span className="text-white text-xs">Assigned To</span>
-                <p className="text-white font-medium">{task.assignedTo}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-
-
-
+        <span className="text-xs text-gray-500">{tasks.length} {tasks.length === 1 ? "task" : "tasks"}</span>
       </div>
+      <ul className="divide-y divide-gray-100">
+        {tasks.map((task) => (
+          <li className="px-4 py-3" key={task.title}>
+            <div className="flex items-start justify-between gap-3">
+              <p className="font-medium text-gray-900">{task.title}</p>
+              <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${PRIORITY_STYLES[task.priority?.toUpperCase()] ?? "bg-gray-50 text-gray-700 ring-gray-200"}`}>
+                {task.priority}
+              </span>
+            </div>
+            <p className="mt-1 text-sm leading-6 text-gray-600">{task.description}</p>
+            <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{task.time}h</span>
+              {task.assignedTo && <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" />{task.assignedTo}</span>}
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -170,14 +158,7 @@ export default function CopilotKitPage() {
       {!showChat ? (
         <HomePage userName={userName} />
       ) : (
-        <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
-          <CopilotChat labels={{
-            title: "AI Task Creation Assistant",
-            initial: `👋 Hi ${userName},  You're chatting with a task creation agent. This agent helps you create tasks from PRD text.\n\nFor example you can try:\n- **Create tasks from PRD**: "Paste your PRD text here"`
-          }} instructions={
-            `You will create tasks from PRD text provided by user having userId ${userId}. Always help users organize their work efficiently.`
-          } />
-        </main>
+        <AssistantChat userName={userName} userId={userId} themeColor={themeColor} />
       )}
     </>
   );
@@ -279,21 +260,3 @@ export default function CopilotKitPage() {
 
 // Weather card component where the location and themeColor are based on what the agent
 // sets via tool calls.
-
-
-
-
-
-
-// Simple sun icon for the weather card
-function SunIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14 text-yellow-200">
-      <circle cx="12" cy="12" r="5" />
-      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" strokeWidth="2" stroke="currentColor" />
-    </svg>
-  );
-}
-
-
-
