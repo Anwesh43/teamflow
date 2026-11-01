@@ -10,26 +10,26 @@ const taskHelperObj = taskHelper();
 const getPriorityColor = (priority: string) => {
   switch (priority?.toUpperCase()) {
     case "P1":
-      return "bg-red-100 text-red-800 border-red-300";
+      return "bg-red-500/10 text-red-700 border-red-500/20";
     case "P2":
-      return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      return "bg-amber-500/10 text-amber-700 border-amber-500/20";
     case "P3":
-      return "bg-blue-100 text-blue-800 border-blue-300";
+      return "bg-blue-500/10 text-blue-700 border-blue-500/20";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-300";
+      return "bg-gray-500/10 text-gray-700 border-gray-500/20";
   }
 };
 
 const getStatusColor = (status?: string) => {
   switch (status?.toLowerCase()) {
     case "completed":
-      return "bg-green-50 border-green-200";
+      return "border-l-green-400";
     case "in_progress":
-      return "bg-blue-50 border-blue-200";
+      return "border-l-blue-400";
     case "blocked":
-      return "bg-red-50 border-red-200";
+      return "border-l-red-400";
     default:
-      return "bg-white border-gray-200";
+      return "border-l-gray-300";
   }
 };
 
@@ -96,9 +96,9 @@ export default function TaskDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 animate-spin">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="glass rounded-3xl px-10 py-8 text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/60 animate-spin">
             <div className="w-8 h-8 rounded-full border-4 border-indigo-200 border-t-indigo-600"></div>
           </div>
           <p className="mt-4 text-gray-600 font-medium">Loading tasks...</p>
@@ -108,18 +108,18 @@ export default function TaskDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="glass rounded-3xl px-6 py-5">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">Tasks</h1>
               <p className="text-gray-600 text-sm mt-1">
                 {taskStats.total} total • {taskStats.completed} completed
               </p>
             </div>
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition">
+            <button className="glass-button px-4 py-2 rounded-xl font-medium">
               + Create Task
             </button>
           </div>
@@ -130,12 +130,12 @@ export default function TaskDashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total", value: taskStats.total, color: "bg-blue-50 text-blue-700" },
-            { label: "Completed", value: taskStats.completed, color: "bg-green-50 text-green-700" },
-            { label: "In Progress", value: taskStats.inProgress, color: "bg-yellow-50 text-yellow-700" },
-            { label: "To Do", value: taskStats.todo, color: "bg-gray-50 text-gray-700" },
+            { label: "Total", value: taskStats.total, color: "text-indigo-700" },
+            { label: "Completed", value: taskStats.completed, color: "text-green-700" },
+            { label: "In Progress", value: taskStats.inProgress, color: "text-amber-700" },
+            { label: "To Do", value: taskStats.todo, color: "text-gray-700" },
           ].map((stat) => (
-            <div key={stat.label} className={`${stat.color} rounded-lg p-4 border border-current border-opacity-20`}>
+            <div key={stat.label} className={`glass ${stat.color} rounded-2xl p-5`}>
               <p className="text-sm font-medium opacity-75">{stat.label}</p>
               <p className="text-3xl font-bold mt-2">{stat.value}</p>
             </div>
@@ -143,17 +143,17 @@ export default function TaskDashboard() {
         </div>
 
         {/* Filters & Search */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
+        <div className="glass rounded-2xl p-4 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
               <input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="glass-input w-full pl-10 pr-4 py-2 rounded-xl"
               />
             </div>
 
@@ -161,7 +161,7 @@ export default function TaskDashboard() {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="glass-input px-4 py-2 rounded-xl text-gray-700"
             >
               <option value="">All Priorities</option>
               <option value="P1">P1 - Critical</option>
@@ -172,7 +172,7 @@ export default function TaskDashboard() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="glass-input px-4 py-2 rounded-xl text-gray-700"
             >
               <option value="">All Status</option>
               <option value="todo">To Do</option>
@@ -182,12 +182,12 @@ export default function TaskDashboard() {
             </select>
 
             {/* View Toggle */}
-            <div className="flex bg-gray-100 rounded-lg">
+            <div className="flex gap-1 rounded-xl bg-white/40 p-1 ring-1 ring-white/70">
               <button
                 onClick={() => setViewMode("list")}
-                className={`px-3 py-2 rounded-l-lg font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition ${
                   viewMode === "list"
-                    ? "bg-white text-indigo-600 shadow-sm"
+                    ? "bg-white/90 text-indigo-600 shadow-sm"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
@@ -195,9 +195,9 @@ export default function TaskDashboard() {
               </button>
               <button
                 onClick={() => setViewMode("grid")}
-                className={`px-3 py-2 rounded-r-lg font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition ${
                   viewMode === "grid"
-                    ? "bg-white text-indigo-600 shadow-sm"
+                    ? "bg-white/90 text-indigo-600 shadow-sm"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
@@ -209,7 +209,7 @@ export default function TaskDashboard() {
 
         {/* Task List/Grid */}
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+          <div className="glass text-center py-12 rounded-3xl">
             <Filter className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
             <p className="text-gray-600">
@@ -219,11 +219,11 @@ export default function TaskDashboard() {
             </p>
           </div>
         ) : viewMode === "list" ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="glass rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
+                  <tr className="border-b border-white/70 bg-white/40">
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Task
                     </th>
@@ -244,9 +244,9 @@ export default function TaskDashboard() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-white/60">
                   {filteredTasks.map((task) => (
-                    <tr key={task.$id} className="hover:bg-gray-50 transition">
+                    <tr key={task.$id} className="hover:bg-white/50 transition">
                       <td className="px-6 py-4">
                         <div>
                           <p className="font-medium text-gray-900">{task.title}</p>
@@ -295,7 +295,7 @@ export default function TaskDashboard() {
             {filteredTasks.map((task) => (
               <div
                 key={task.$id}
-                className={`rounded-lg border-2 p-6 transition hover:shadow-lg ${getStatusColor(
+                className={`glass rounded-2xl border-l-4 p-6 transition hover:-translate-y-0.5 hover:bg-white/70 ${getStatusColor(
                   task.status
                 )}`}
               >
@@ -327,11 +327,11 @@ export default function TaskDashboard() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t border-gray-300 border-opacity-30">
-                  <button className="flex-1 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded transition">
+                <div className="flex gap-2 pt-4 border-t border-white/70">
+                  <button className="flex-1 px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-white/60 rounded-lg transition">
                     Edit
                   </button>
-                  <button className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded transition">
+                  <button className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/60 rounded-lg transition">
                     •••
                   </button>
                 </div>
